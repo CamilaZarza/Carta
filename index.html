@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartita para vos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Variables CSS para personalización fácil */
+        :root {
+            --color-fondo-body: linear-gradient(135deg, #f5f7fa 0%, #e2c3c3 100%);
+            --color-sobre: #f9f9f9;
+            --color-flap: #e6e6e6;
+            --color-texto: #333;
+            --color-borde: #e0e0e0;
+            --sombra-suave: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --sombra-fuerte: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --transicion-rapida: 0.3s ease-in-out;
+            --transicion-lenta: 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            --tamano-sobre: 300px;
+            --altura-sobre: 180px;
+            --color-spotify: #1DB954;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: var(--color-fondo-body);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .envelope {
+            position: relative;
+            width: var(--tamano-sobre);
+            height: var(--altura-sobre);
+            background-color: var(--color-sobre);
+            border-radius: 10px;
+            box-shadow: var(--sombra-suave);
+            transition: all var(--transicion-lenta);
+            overflow: hidden;
+        }
+
+        .envelope:before,
+        .envelope:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        /* Pliegue inferior y lateral */
+        .envelope:before {
+            top: 0;
+            left: 0;
+            border-width: calc(var(--altura-sobre) / 2) calc(var(--tamano-sobre) / 2);
+            border-color: var(--color-borde) transparent transparent transparent;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        /* Pliegue superior (detrás del flap) */
+        .envelope:after {
+            bottom: 0;
+            left: 0;
+            border-width: calc(var(--altura-sobre) / 2) calc(var(--tamano-sobre) / 2);
+            border-color: transparent transparent var(--color-sobre) transparent;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(var(--altura-sobre) / 2);
+            background-color: var(--color-flap);
+            transform-origin: top;
+            transition: transform var(--transicion-lenta);
+            border-radius: 10px 10px 0 0;
+            transform: rotateX(0deg);
+            z-index: 10;
+        }
+        
+        .flap:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 calc(var(--tamano-sobre) / 2) calc(var(--altura-sobre) / 2) calc(var(--tamano-sobre) / 2);
+            border-color: transparent transparent var(--color-flap) transparent;
+        }
+        
+        /* Efecto de apertura */
+        .container.open .flap {
+            transform: rotateX(180deg);
+            transition: transform var(--transicion-lenta);
+        }
+
+        .container.open .envelope {
+            transform: translateY(calc(var(--altura-sobre) / 2));
+            box-shadow: var(--sombra-fuerte);
+        }
+
+        .container.open .message-text {
+            opacity: 0;
+        }
+
+        .message-text {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--color-texto);
+            z-index: 5;
+            transition: opacity var(--transicion-rapida);
+        }
+        
+        #carta {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transicion-lenta);
+            z-index: 100;
+            width: 90%;
+            max-width: 1000px;
+            gap: 20px;
+        }
+
+        #carta img {
+            max-width: 500px;
+            height: auto;
+            flex-shrink: 0;
+            border-radius: 8px;
+            box-shadow: var(--sombra-fuerte);
+        }
+
+        #carta button {
+            background-color: var(--color-spotify);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+            flex: 0 1 auto;
+        }
+
+        #carta button::before {
+            content: '🎵';
+            font-size: 20px;
+        }
+
+        #carta button:hover {
+            background-color: #1ed760;
+        }
+
+        .container.open #carta {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* --- Media Query para Responsive --- */
+        @media (max-width: 600px) {
+            :root {
+                --tamano-sobre: 80vw; /* Ancho relativo a la pantalla */
+                --altura-sobre: calc(var(--tamano-sobre) * 0.6); /* Mantiene la proporción */
+            }
+            .message-text {
+                font-size: 16px;
+            }
+            #carta {
+                flex-direction: column;
+                width: 95%;
+            }
+            #carta img {
+                width: 100%;
+                max-width: 500px;
+            }
+            #carta button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="envelope">
+            <div class="message-text">Haz Clic Para Abrir</div>
+        </div>
+        <div class="flap"></div>
+        <div id="carta">
+            <img src="carta.jpg" alt="Carta">
+            <button onclick="window.open('https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M', '_blank')">Playlist</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('container').addEventListener('click', function() {
+            if (!this.classList.contains('open')) {
+                this.classList.add('open');
+            }
+        });
+    </script>
+</body>
+</html>
